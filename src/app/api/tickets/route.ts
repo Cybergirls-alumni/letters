@@ -16,8 +16,11 @@ const submitSchema = z.object({
   organizationName: z.string().min(1, "Organisation name is required"),
   submissionDeadline: z.string().optional(),
   additionalInfo: z.string().optional(),
-  // Only accept file paths within our own uploads directory
-  letterFileUrl: z.string().startsWith("/uploads/").optional(),
+  // Accept local upload paths or Vercel Blob URLs
+  letterFileUrl: z.union([
+    z.string().startsWith("/uploads/"),
+    z.string().url(),
+  ]).optional(),
   orgFormUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
 });
 
