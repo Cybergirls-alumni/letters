@@ -27,7 +27,9 @@ export async function POST(req: NextRequest) {
 
   // Use Vercel Blob in production, local filesystem in development
   if (process.env.BLOB_READ_WRITE_TOKEN) {
-    const blob = await put(file.name, file, { access: "public" });
+    const ext = file.name.split(".").pop() ?? "docx";
+    const uniqueName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const blob = await put(uniqueName, file, { access: "public" });
     return NextResponse.json({ url: blob.url }, { status: 201 });
   }
 
