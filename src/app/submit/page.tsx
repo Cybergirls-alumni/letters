@@ -8,18 +8,45 @@ import { z } from "zod";
 import Link from "next/link";
 
 const schema = z.object({
-  admissionNumber: z.string().min(1, "Admission number is required"),
-  candidateName: z.string().min(1, "Full name is required"),
-  candidateEmail: z.string().email("Please enter a valid email address"),
-  phoneNumber: z.string().optional(),
+  admissionNumber: z
+    .string()
+    .regex(/^CG\/\d{2}\/\d{4}$/, "Must match the format CG/xx/xxxx (e.g. CG/22/0042)"),
+  candidateName: z
+    .string()
+    .min(2, "Full name must be at least 2 characters")
+    .max(100, "Full name is too long"),
+  candidateEmail: z
+    .string()
+    .email("Please enter a valid email address"),
+  phoneNumber: z
+    .string()
+    .regex(/^\+?[0-9\s\-\(\)]{7,20}$/, "Enter a valid phone number (e.g. +234 801 234 5678)")
+    .optional()
+    .or(z.literal("")),
   purpose: z.enum(["SCHOOL_ADMISSION", "JOB_APPLICATION", "OTHER"]).refine(
     (v) => v !== undefined,
     { message: "Please select a purpose" }
   ),
-  organizationName: z.string().min(1, "Organisation / institution name is required"),
-  submissionDeadline: z.string().optional(),
-  orgFormUrl: z.string().url("Must be a valid URL (include https://)").optional().or(z.literal("")),
-  additionalInfo: z.string().optional(),
+  organizationName: z
+    .string()
+    .min(2, "Organisation name must be at least 2 characters")
+    .max(200, "Organisation name is too long"),
+  submissionDeadline: z
+    .string()
+    .refine(
+      (v) => !v || new Date(v) >= new Date(new Date().toDateString()),
+      "Deadline cannot be in the past"
+    )
+    .optional(),
+  orgFormUrl: z
+    .string()
+    .url("Must be a valid URL (include https://)")
+    .optional()
+    .or(z.literal("")),
+  additionalInfo: z
+    .string()
+    .max(2000, "Must be under 2000 characters")
+    .optional(),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -66,7 +93,10 @@ export default function SubmitPage() {
       body: JSON.stringify({
         ...values,
         letterFileUrl: uploadedUrl ?? undefined,
+        phoneNumber: values.phoneNumber || undefined,
         orgFormUrl: values.orgFormUrl || undefined,
+        additionalInfo: values.additionalInfo || undefined,
+        submissionDeadline: values.submissionDeadline || undefined,
       }),
     });
     const data = await res.json();

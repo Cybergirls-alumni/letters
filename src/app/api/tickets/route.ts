@@ -8,20 +8,39 @@ import {
 } from "@/lib/email";
 
 const submitSchema = z.object({
-  admissionNumber: z.string().min(1, "Admission number is required"),
-  candidateName: z.string().min(1, "Full name is required"),
-  candidateEmail: z.string().email("Valid email is required"),
-  phoneNumber: z.string().optional(),
+  admissionNumber: z
+    .string()
+    .regex(/^CG\/\d{2}\/\d{4}$/, "Invalid admission number format"),
+  candidateName: z
+    .string()
+    .min(2, "Full name must be at least 2 characters")
+    .max(100, "Full name is too long"),
+  candidateEmail: z
+    .string()
+    .email("Valid email is required"),
+  phoneNumber: z
+    .string()
+    .regex(/^\+?[0-9\s\-\(\)]{7,20}$/, "Invalid phone number")
+    .optional(),
   purpose: z.enum(["SCHOOL_ADMISSION", "JOB_APPLICATION", "OTHER"]),
-  organizationName: z.string().min(1, "Organisation name is required"),
-  submissionDeadline: z.string().optional(),
-  additionalInfo: z.string().optional(),
+  organizationName: z
+    .string()
+    .min(2, "Organisation name is required")
+    .max(200, "Organisation name is too long"),
+  submissionDeadline: z
+    .string()
+    .refine(
+      (v) => !v || new Date(v) >= new Date(new Date().toDateString()),
+      "Deadline cannot be in the past"
+    )
+    .optional(),
+  additionalInfo: z.string().max(2000, "Must be under 2000 characters").optional(),
   // Accept local upload paths or Vercel Blob URLs
   letterFileUrl: z.union([
     z.string().startsWith("/uploads/"),
     z.string().url(),
   ]).optional(),
-  orgFormUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  orgFormUrl: z.string().url("Must be a valid URL").optional(),
 });
 
 export async function POST(req: NextRequest) {
