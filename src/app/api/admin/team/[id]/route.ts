@@ -60,6 +60,14 @@ export async function DELETE(
 
   const { id } = await params;
 
+  // Prevent deleting your own account
+  if (session.user.id === id) {
+    return NextResponse.json(
+      { error: "You cannot remove your own account." },
+      { status: 403 }
+    );
+  }
+
   // Check for existing status history or notes authored by this member
   const [historyCount, notesCount] = await Promise.all([
     prisma.statusHistory.count({ where: { changedById: id } }),
