@@ -59,86 +59,6 @@ Each status transition is logged with a timestamp and the name of the admin who 
 
 ---
 
-## Local Development
-
-### Prerequisites
-
-- [Bun](https://bun.sh) (`curl -fsSL https://bun.sh/install | bash`)
-- Node.js 18+
-
-### Setup
-
-```bash
-# Clone and install dependencies
-git clone https://github.com/Cybergirls-alumni/letters.git
-cd letters
-bun install
-
-# Copy environment variables
-cp .env.example .env
-```
-
-Edit `.env` — the defaults work for local development as-is. See [Environment Variables](#environment-variables) below for what each one does.
-
-```bash
-# Push the schema to your local SQLite database
-bun run prisma db push
-
-# Create the first admin user
-bun run db:seed
-
-# Start the dev server
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000).
-
-Log into the admin dashboard at [http://localhost:3000/admin](http://localhost:3000/admin) with:
-- **Email:** `admin@cybersafefoundation.org`
-- **Password:** `cybergirls2024!`
-
-Change the password after first login.
-
----
-
-## Environment Variables
-
-```bash
-# ── Database ───────────────────────────────────────────────────────────────────
-# Local SQLite (development default):
-DATABASE_URL="file:./dev.db"
-
-# Turso (production — see Deployment section):
-# DATABASE_URL="libsql://your-db-name.turso.io"
-# DATABASE_AUTH_TOKEN="your-turso-auth-token"
-
-# ── Auth ───────────────────────────────────────────────────────────────────────
-# Generate with: openssl rand -base64 32
-AUTH_SECRET="your-secret-here"
-
-# Set to your production URL when deploying
-NEXTAUTH_URL="http://localhost:3000"
-
-# ── Email (Resend) ─────────────────────────────────────────────────────────────
-# Optional. If not set, email notifications are silently skipped.
-RESEND_API_KEY=""
-EMAIL_FROM="CyberGirls <noreply@cybersafefoundation.org>"
-ADMIN_NOTIFICATION_EMAIL="alumni@cybersafefoundation.org"
-
-# ── App ────────────────────────────────────────────────────────────────────────
-NEXT_PUBLIC_APP_URL="http://localhost:3000"
-
-# ── Seed ───────────────────────────────────────────────────────────────────────
-# Credentials for the initial admin user created by `bun run db:seed`
-SEED_ADMIN_EMAIL="admin@cybersafefoundation.org"
-SEED_ADMIN_PASSWORD="change-me-after-first-login!"
-SEED_ADMIN_NAME="CyberGirls Admin"
-```
-
-`BLOB_READ_WRITE_TOKEN` is set automatically by Vercel when you enable Blob storage on the project. You don't need to set it manually.
-
----
-
 ## Project Structure
 
 ```
@@ -174,70 +94,6 @@ prisma/
 
 ---
 
-## Database
-
-### Local development
-
-The app uses a local SQLite file (`dev.db`) out of the box. No setup needed.
-
-### Production
-
-SQLite files can't be used on serverless platforms (like Vercel) because the filesystem is ephemeral. The app is pre-configured to use **Turso**, a hosted libsql service, with no code changes required — just different environment variables.
-
-**Setting up Turso:**
-
-```bash
-# Install the Turso CLI
-brew install tursodatabase/tap/turso
-
-turso auth login
-turso db create cybergirls-letters
-
-# Get your database URL
-turso db show cybergirls-letters
-
-# Generate an auth token
-turso db tokens create cybergirls-letters
-```
-
-Set `DATABASE_URL` and `DATABASE_AUTH_TOKEN` in your `.env` (or Vercel environment variables), then:
-
-```bash
-# Push the schema to Turso
-bun run prisma db push
-
-# Seed the initial admin user
-bun run db:seed
-```
-
----
-
-## Deployment (Vercel)
-
-1. Push the repo to GitHub
-2. Import the project at [vercel.com](https://vercel.com)
-3. Enable **Vercel Blob** storage under Storage → Create → Blob (this sets `BLOB_READ_WRITE_TOKEN` automatically)
-4. Add all environment variables under Settings → Environment Variables (see [Environment Variables](#environment-variables))
-5. Deploy
-
-The app will be live at your `*.vercel.app` URL. To connect a custom domain, go to Settings → Domains and add it. Vercel will give you the exact DNS record to add.
-
----
-
-## Available Scripts
-
-```bash
-bun dev              # Start development server
-bun run build        # Production build
-bun run lint         # Run ESLint
-
-bun run db:migrate   # Run Prisma migrations (development)
-bun run db:seed      # Create the initial admin user
-bun run db:studio    # Open Prisma Studio (database GUI)
-```
-
----
-
 ## Data Model
 
 **`Ticket`** — a recommendation letter request. Holds all candidate information, request details, current status, and file references.
@@ -252,4 +108,4 @@ bun run db:studio    # Open Prisma Studio (database GUI)
 
 ## Contributing
 
-This project is maintained by the CyberSafe Foundation alumni team. If you are a team member and need access, contact the current alumni coordinator.
+This project is maintained by the CyberSafe Foundation alumni team. If you are a team member and need access, contact the current alumni president.
