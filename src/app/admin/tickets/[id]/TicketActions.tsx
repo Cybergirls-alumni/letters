@@ -6,7 +6,7 @@ import {
   TicketStatus,
   TICKET_STATUS_LABELS,
 } from "@/types";
-import { formatDateTime } from "@/lib/utils";
+import { formatDateTime, BASE_PATH } from "@/lib/utils";
 
 interface TeamMember {
   id: string;
@@ -70,7 +70,7 @@ export default function TicketActions({
     else body.assignedAdminId = null;
     if (status === "REJECTED") body.rejectionReason = rejectionReason;
 
-    const res = await fetch(`/api/admin/tickets/${ticketId}`, {
+    const res = await fetch(`${BASE_PATH}/api/admin/tickets/${ticketId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
@@ -89,7 +89,7 @@ export default function TicketActions({
     if (!noteBody.trim()) return;
     setAddingNote(true);
 
-    const res = await fetch(`/api/admin/tickets/${ticketId}/notes`, {
+    const res = await fetch(`${BASE_PATH}/api/admin/tickets/${ticketId}/notes`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ body: noteBody }),

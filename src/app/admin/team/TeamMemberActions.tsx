@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { BASE_PATH } from "@/lib/utils";
 
 interface Member {
   id: string;
@@ -21,7 +22,7 @@ export default function TeamMemberActions({ member }: { member: Member }) {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    const res = await fetch(`/api/admin/team/${member.id}`, {
+    const res = await fetch(`${BASE_PATH}/api/admin/team/${member.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email }),
@@ -39,7 +40,7 @@ export default function TeamMemberActions({ member }: { member: Member }) {
   async function handleDelete() {
     setLoading(true);
     setError(null);
-    const res = await fetch(`/api/admin/team/${member.id}`, { method: "DELETE" });
+    const res = await fetch(`${BASE_PATH}/api/admin/team/${member.id}`, { method: "DELETE" });
     const data = await res.json();
     if (!res.ok) {
       setError(data.error ?? "Failed to remove.");

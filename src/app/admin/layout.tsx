@@ -46,7 +46,7 @@ export default async function AdminLayout({
             <form
               action={async () => {
                 "use server";
-                await signOut({ redirectTo: "/admin/login" });
+                await signOut({ redirectTo: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/admin/login` });
               }}
             >
               <button

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { BASE_PATH } from "@/lib/utils";
 
 export default function AddTeamMemberForm() {
   const router = useRouter();
@@ -18,7 +19,7 @@ export default function AddTeamMemberForm() {
     setError(null);
     setSuccess(false);
 
-    const res = await fetch("/api/admin/team", {
+    const res = await fetch(`${BASE_PATH}/api/admin/team`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email, password }),

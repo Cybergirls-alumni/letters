@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { BASE_PATH } from "@/lib/utils";
 import Link from "next/link";
 
 const schema = z.object({
@@ -73,7 +74,7 @@ export default function SubmitPage() {
 
     const fd = new FormData();
     fd.append("file", file);
-    const res = await fetch("/api/upload", { method: "POST", body: fd });
+    const res = await fetch(`${BASE_PATH}/api/upload`, { method: "POST", body: fd });
     const data = await res.json();
 
     if (!res.ok) {
@@ -87,7 +88,7 @@ export default function SubmitPage() {
   async function onSubmit(values: FormValues) {
     setSubmitting(true);
     setError(null);
-    const res = await fetch("/api/tickets", {
+    const res = await fetch(`${BASE_PATH}/api/tickets`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

@@ -5,6 +5,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
 /**
  * Generate a collision-safe ticket reference like CG-2026-K3F9A.
  * Uses a random 5-char alphanumeric suffix — safe under concurrent requests.

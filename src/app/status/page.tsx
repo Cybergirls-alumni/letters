@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { BASE_PATH } from "@/lib/utils";
 import {
   TicketStatus,
   TICKET_STATUS_LABELS,
@@ -32,7 +33,7 @@ export default function StatusPage() {
     setTickets(null);
 
     const res = await fetch(
-      `/api/status?admissionNumber=${encodeURIComponent(admissionNumber.trim())}`
+      `${BASE_PATH}/api/status?admissionNumber=${encodeURIComponent(admissionNumber.trim())}`
     );
     const data = await res.json();
 
