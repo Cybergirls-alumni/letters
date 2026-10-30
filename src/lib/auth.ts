@@ -1,9 +1,14 @@
-import NextAuth from "next-auth";
+import NextAuth, { CredentialsSignin } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { authConfig } from "@/lib/auth.config";
 import { clientIp, hitLimit } from "@/lib/rate-limit";
+
+// Surfaced to the login form so a locked-out user isn't told their (possibly correct) password is wrong
+class RateLimitedError extends CredentialsSignin {
+  code = "rate_limited";
+}
 
 const LOGIN_WINDOW_MS = 15 * 60 * 1000;
 
@@ -27,7 +32,7 @@ const nextAuth = NextAuth({
           hitLimit(`login-ip:${clientIp(request.headers)}`, 20, LOGIN_WINDOW_MS) ||
           hitLimit(`login-email:${email.toLowerCase()}`, 10, LOGIN_WINDOW_MS)
         ) {
-          return null;
+          throw new RateLimitedError();
         }
 
         const admin = await prisma.adminUser.findUnique({ where: { email } });

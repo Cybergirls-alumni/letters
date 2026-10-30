@@ -69,7 +69,7 @@ export async function sendSubmissionConfirmation(ticket: {
       <p>Hi ${esc(ticket.candidateName)},</p>
       <p>We've received your recommendation letter request. Your ticket reference is:</p>
       <h3 style="font-size:24px;color:#1d4ed8;">${ticket.ticketRef}</h3>
-      <p>You can use your admission number and this email address to track the status of your request at any time:</p>
+      <p>You can use this ticket reference (or your admission number) and this email address to track the status of your request at any time:</p>
       <p><a href="${APP_URL}/status">Check Status →</a></p>
       <p>Please note that we require at least <strong>two weeks' notice</strong> to process recommendation letter requests.</p>
       <p>The CyberSafe Foundation Team</p>

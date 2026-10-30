@@ -19,7 +19,7 @@ interface TicketSummary {
 }
 
 export default function StatusPage() {
-  const [admissionNumber, setAdmissionNumber] = useState("");
+  const [reference, setReference] = useState("");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [tickets, setTickets] = useState<TicketSummary[] | null>(null);
@@ -28,7 +28,7 @@ export default function StatusPage() {
 
   async function handleSearch(e: React.FormEvent) {
     e.preventDefault();
-    if (!admissionNumber.trim() || !email.trim()) return;
+    if (!reference.trim() || !email.trim()) return;
     setLoading(true);
     setError(null);
     setTickets(null);
@@ -36,7 +36,7 @@ export default function StatusPage() {
     const res = await fetch(`${BASE_PATH}/api/status`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ admissionNumber: admissionNumber.trim(), email: email.trim() }),
+      body: JSON.stringify({ reference: reference.trim(), email: email.trim() }),
     });
     const data = await res.json();
 
@@ -67,15 +67,15 @@ export default function StatusPage() {
       <main className="max-w-2xl mx-auto px-4 py-10">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100 mb-2">Track Your Request</h1>
         <p className="text-gray-600 dark:text-slate-400 text-sm mb-8">
-          Enter your CyberGirls admission number and the email you used on your request to see its status.
+          Enter the ticket reference from your confirmation (or your CyberGirls admission number) and the email you used on your request to see its status.
         </p>
 
         <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3 mb-8">
           <input
             type="text"
-            value={admissionNumber}
-            onChange={(e) => setAdmissionNumber(e.target.value)}
-            placeholder="e.g. CG/xx/xxxx"
+            value={reference}
+            onChange={(e) => setReference(e.target.value)}
+            placeholder="Ticket ref (CG-2026-XXXXX) or admission no."
             className="flex-1 rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-800 px-4 py-2.5 text-sm text-gray-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <input
@@ -87,7 +87,7 @@ export default function StatusPage() {
           />
           <button
             type="submit"
-            disabled={loading || !admissionNumber.trim() || !email.trim()}
+            disabled={loading || !reference.trim() || !email.trim()}
             className="px-6 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm transition-colors"
           >
             {loading ? "Searching..." : "Search"}
@@ -104,7 +104,7 @@ export default function StatusPage() {
           <div className="text-center py-12 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
             <p className="text-gray-500 dark:text-slate-400 font-medium mb-1">No requests found</p>
             <p className="text-gray-400 dark:text-slate-500 text-sm">
-              No recommendation letter requests found for this admission number and email.
+              No recommendation letter requests found for this reference and email.
             </p>
             <Link
               href="/submit"
