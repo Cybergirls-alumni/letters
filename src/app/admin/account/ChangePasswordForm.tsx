@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { BASE_PATH } from "@/lib/utils";
 
 export default function ChangePasswordForm() {
+  const router = useRouter();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -29,6 +31,8 @@ export default function ChangePasswordForm() {
       setSuccess(true);
       setCurrentPassword("");
       setNewPassword("");
+      // Every session, including this one, is now invalid
+      setTimeout(() => router.push("/admin/login"), 1500);
     }
     setLoading(false);
   }
@@ -72,7 +76,7 @@ export default function ChangePasswordForm() {
       )}
       {success && (
         <p className="text-sm text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg px-3 py-2">
-          Password changed.
+          Password changed. Redirecting you to sign in again...
         </p>
       )}
 

@@ -16,10 +16,14 @@ export const authConfig: NextAuthConfig = {
     },
     session({ session, token }) {
       if (token?.sub) session.user.id = token.sub;
+      if (token?.pwv) session.user.pwv = token.pwv as string;
       return session;
     },
     jwt({ token, user }) {
-      if (user) token.sub = user.id;
+      if (user) {
+        token.sub = user.id;
+        token.pwv = user.pwv;
+      }
       return token;
     },
   },
