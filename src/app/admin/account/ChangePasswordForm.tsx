@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { BASE_PATH } from "@/lib/utils";
 
 export default function ChangePasswordForm() {
+  const router = useRouter();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -30,7 +32,7 @@ export default function ChangePasswordForm() {
       setCurrentPassword("");
       setNewPassword("");
       // Every session, including this one, is now invalid
-      setTimeout(() => window.location.assign(`${BASE_PATH}/admin/login`), 1500);
+      setTimeout(() => router.push("/admin/login"), 1500);
     }
     setLoading(false);
   }
