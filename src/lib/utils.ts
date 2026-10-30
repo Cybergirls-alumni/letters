@@ -13,7 +13,10 @@ export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
  */
 export function generateTicketRef(): string {
   const year = new Date().getFullYear();
-  const suffix = Math.random().toString(36).slice(2, 7).toUpperCase();
+  // Unambiguous alphabet (no 0/O/1/I), cryptographically random
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const bytes = crypto.getRandomValues(new Uint8Array(5));
+  const suffix = Array.from(bytes, (b) => alphabet[b % alphabet.length]).join("");
   return `CG-${year}-${suffix}`;
 }
 

@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { readJson } from "@/lib/http";
 
 const noteSchema = z.object({
-  body: z.string().min(1, "Note body is required"),
+  body: z.string().min(1, "Note body is required").max(5000, "Note is too long"),
 });
 
 export async function POST(
@@ -17,7 +18,10 @@ export async function POST(
   }
 
   const { id } = await params;
-  const body = await req.json();
+  const body = await readJson(req);
+  if (body === undefined) {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
   const parsed = noteSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: "Validation failed" }, { status: 400 });

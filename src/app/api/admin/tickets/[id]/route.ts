@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { readJson } from "@/lib/http";
 import {
   sendStatusUpdateNotification,
   sendAssigneeStatusUpdateNotification,
@@ -23,7 +24,7 @@ const patchSchema = z.object({
     ])
     .optional(),
   assignedAdminId: z.string().nullable().optional(),
-  rejectionReason: z.string().optional(),
+  rejectionReason: z.string().max(1000, "Reason must be under 1000 characters").optional(),
 });
 
 export async function GET(
@@ -69,18 +70,29 @@ export async function PATCH(
   }
 
   const { id } = await params;
-  const body = await req.json();
+  const body = await readJson(req);
+  if (body === undefined) {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
   const parsed = patchSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: "Validation failed", issues: parsed.error.flatten() }, { status: 400 });
   }
 
-  const existing = await prisma.ticket.findFirst({
-    where: { OR: [{ id }, { ticketRef: id }] },
-    include: { assignedAdmin: { select: { name: true, email: true } } },
-  });
+  const [existing, newAssignee] = await Promise.all([
+    prisma.ticket.findFirst({
+      where: { OR: [{ id }, { ticketRef: id }] },
+      include: { assignedAdmin: { select: { name: true, email: true } } },
+    }),
+    parsed.data.assignedAdminId
+      ? prisma.adminUser.findUnique({ where: { id: parsed.data.assignedAdminId } })
+      : null,
+  ]);
   if (!existing) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+  if (parsed.data.assignedAdminId && !newAssignee) {
+    return NextResponse.json({ error: "Assignee not found" }, { status: 400 });
   }
 
   const update: Record<string, unknown> = {};
@@ -141,12 +153,9 @@ export async function PATCH(
     parsed.data.assignedAdminId &&
     parsed.data.assignedAdminId !== existing.assignedAdminId
   ) {
-    const assignee = await prisma.adminUser.findUnique({
-      where: { id: parsed.data.assignedAdminId },
-    });
-    if (assignee) {
+    if (newAssignee) {
       sendAssignmentNotification(
-        { name: assignee.name, email: assignee.email },
+        { name: newAssignee.name, email: newAssignee.email },
         { ticketRef: existing.ticketRef, candidateName: existing.candidateName }
       ).catch(console.error);
     }

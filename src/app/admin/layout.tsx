@@ -42,7 +42,12 @@ export default async function AdminLayout({
           </div>
 
           <div className="flex items-center gap-4">
-            <span className="text-xs text-gray-500 dark:text-slate-400">{session.user.name}</span>
+            <Link
+              href="/admin/account"
+              className="text-xs text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white"
+            >
+              {session.user.name}
+            </Link>
             <form
               action={async () => {
                 "use server";

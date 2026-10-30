@@ -7,9 +7,10 @@ export const authConfig: NextAuthConfig = {
   },
   callbacks: {
     authorized({ auth, request }) {
+      const { pathname } = request.nextUrl;
       const isAdminPath =
-        request.nextUrl.pathname.startsWith("/admin") &&
-        !request.nextUrl.pathname.startsWith("/admin/login");
+        (pathname.startsWith("/admin") || pathname.startsWith("/api/admin")) &&
+        !pathname.startsWith("/admin/login");
       if (isAdminPath) return !!auth?.user;
       return true;
     },
@@ -23,5 +24,5 @@ export const authConfig: NextAuthConfig = {
     },
   },
   providers: [], // Credentials provider added in auth.ts (requires Prisma/Node.js)
-  session: { strategy: "jwt" },
+  session: { strategy: "jwt", maxAge: 60 * 60 * 8 }, // 8h instead of the 30-day default
 };

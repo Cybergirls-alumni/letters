@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { generateTicketRef } from "@/lib/utils";
+import { rateLimit } from "@/lib/rate-limit";
+import { readJson } from "@/lib/http";
 import {
   sendNewTicketNotification,
   sendSubmissionConfirmation,
@@ -35,19 +37,25 @@ const submitSchema = z.object({
     )
     .optional(),
   additionalInfo: z.string().max(2000, "Must be under 2000 characters").optional(),
-  // Accept local upload paths or Vercel Blob URLs
+  // Accept local upload paths or Vercel Blob URLs only (what /api/upload returns)
   letterFileUrl: z.union([
-    z.string().startsWith("/uploads/"),
-    z.string().url(),
+    z.string().regex(/^\/uploads\/[\w.-]+$/),
+    z.string().regex(/^https:\/\/[a-z0-9-]+\.public\.blob\.vercel-storage\.com\/[\w.-]+$/i),
   ]).optional(),
-  orgFormUrl: z.string().url("Must be a valid URL").optional(),
+  orgFormUrl: z
+    .string()
+    .url("Must be a valid URL")
+    .max(2000, "URL is too long")
+    .refine((v) => /^https?:\/\//i.test(v), "Must be an http(s) URL")
+    .optional(),
 });
 
 export async function POST(req: NextRequest) {
-  let body: unknown;
-  try {
-    body = await req.json();
-  } catch {
+  const limited = rateLimit(req, "tickets", 10, 60 * 60 * 1000);
+  if (limited) return limited;
+
+  const body = await readJson(req);
+  if (body === undefined) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 

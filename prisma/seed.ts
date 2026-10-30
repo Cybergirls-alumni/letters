@@ -23,7 +23,10 @@ async function main() {
   const prisma = new PrismaClient({ adapter } as ConstructorParameters<typeof PrismaClient>[0]);
 
   const email = process.env.SEED_ADMIN_EMAIL ?? "admin@cybersafefoundation.org";
-  const password = process.env.SEED_ADMIN_PASSWORD ?? "cybergirls2024!";
+  const password = process.env.SEED_ADMIN_PASSWORD;
+  if (!password || password.length < 12) {
+    throw new Error("Set SEED_ADMIN_PASSWORD (min 12 characters) before seeding");
+  }
   const name = process.env.SEED_ADMIN_NAME ?? "CyberGirls Admin";
 
   try {
@@ -35,13 +38,12 @@ async function main() {
 
     const passwordHash = await bcrypt.hash(password, 12);
     const admin = await prisma.adminUser.create({
-      data: { email, name, passwordHash },
+      data: { email, name, passwordHash, role: "OWNER" },
     });
 
     console.log(`✅ Created admin user:`);
     console.log(`   Email:    ${admin.email}`);
-    console.log(`   Password: ${password}`);
-    console.log(`   ⚠️  Change this password after first login!`);
+    console.log(`   Password: (the SEED_ADMIN_PASSWORD you provided)`);
   } finally {
     await prisma.$disconnect();
   }

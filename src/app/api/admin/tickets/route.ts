@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const page = parseInt(req.nextUrl.searchParams.get("page") ?? "1");
+  const page = Math.max(1, parseInt(req.nextUrl.searchParams.get("page") ?? "1") || 1);
   const limit = 20;
   const skip = (page - 1) * limit;
 
