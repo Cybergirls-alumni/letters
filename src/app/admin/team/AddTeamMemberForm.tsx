@@ -76,10 +76,10 @@ export default function AddTeamMemberForm() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          minLength={8}
+          minLength={12}
           className="w-full rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">Minimum 8 characters</p>
+        <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">Minimum 12 characters</p>
       </div>
 
       {error && (

@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { readJson } from "@/lib/http";
 
 const patchSchema = z.object({
-  name: z.string().min(1, "Name is required").optional(),
+  name: z.string().min(1, "Name is required").max(100, "Name is too long").optional(),
   email: z.string().email("Valid email is required").optional(),
 });
 
@@ -16,9 +17,15 @@ export async function PATCH(
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  if (session.user.role !== "OWNER") {
+    return NextResponse.json({ error: "Only an owner can edit team members" }, { status: 403 });
+  }
 
   const { id } = await params;
-  const body = await req.json();
+  const body = await readJson(req);
+  if (body === undefined) {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
   const parsed = patchSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
@@ -56,6 +63,9 @@ export async function DELETE(
   const session = await auth();
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  if (session.user.role !== "OWNER") {
+    return NextResponse.json({ error: "Only an owner can remove team members" }, { status: 403 });
   }
 
   const { id } = await params;

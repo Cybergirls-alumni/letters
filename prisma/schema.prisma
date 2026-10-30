@@ -16,6 +16,7 @@ model AdminUser {
   email        String   @unique
   passwordHash String
   name         String
+  role         String   @default("ADMIN") // OWNER (can manage the team) | ADMIN
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -59,6 +60,11 @@ model Ticket {
 
   statusHistory StatusHistory[]
   notes         Note[]
+
+  @@index([admissionNumber])
+  @@index([status])
+  @@index([assignedAdminId])
+  @@index([createdAt])
 }
 
 /// Immutable audit log — one row per status transition

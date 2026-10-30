@@ -42,8 +42,8 @@ export default async function SuccessPage({
         )}
 
         <p className="text-sm text-gray-600 dark:text-slate-400 mb-6">
-          Use your <strong>CyberGirls admission number</strong> to check the status of
-          your request at any time.
+          Use this ticket reference (or your <strong>CyberGirls admission number</strong>) with
+          the email you submitted to check the status of your request at any time.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3">

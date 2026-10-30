@@ -12,6 +12,16 @@ const FROM = process.env.EMAIL_FROM ?? "CyberGirls <noreply@cybersafefoundation.
 const ADMIN_EMAIL = process.env.ADMIN_NOTIFICATION_EMAIL ?? "alumni@cybersafefoundation.org";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
+// Escape user-supplied values before interpolating into email HTML
+function esc(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 export async function sendNewTicketNotification(ticket: {
   ticketRef: string;
   candidateName: string;
@@ -31,10 +41,10 @@ export async function sendNewTicketNotification(ticket: {
     html: `
       <h2>New Recommendation Letter Request</h2>
       <p><strong>Ticket:</strong> ${ticket.ticketRef}</p>
-      <p><strong>Name:</strong> ${ticket.candidateName}</p>
-      <p><strong>Email:</strong> ${ticket.candidateEmail}</p>
-      <p><strong>Purpose:</strong> ${ticket.purpose}</p>
-      <p><strong>Organisation:</strong> ${ticket.organizationName}</p>
+      <p><strong>Name:</strong> ${esc(ticket.candidateName)}</p>
+      <p><strong>Email:</strong> ${esc(ticket.candidateEmail)}</p>
+      <p><strong>Purpose:</strong> ${esc(ticket.purpose)}</p>
+      <p><strong>Organisation:</strong> ${esc(ticket.organizationName)}</p>
       <p><a href="${APP_URL}/admin/tickets/${ticket.ticketRef}">View in Dashboard →</a></p>
     `,
   });
@@ -56,10 +66,10 @@ export async function sendSubmissionConfirmation(ticket: {
     subject: `Your recommendation letter request has been received — ${ticket.ticketRef}`,
     html: `
       <h2>Request Received!</h2>
-      <p>Hi ${ticket.candidateName},</p>
+      <p>Hi ${esc(ticket.candidateName)},</p>
       <p>We've received your recommendation letter request. Your ticket reference is:</p>
       <h3 style="font-size:24px;color:#1d4ed8;">${ticket.ticketRef}</h3>
-      <p>You can use your admission number to track the status of your request at any time:</p>
+      <p>You can use this ticket reference (or your admission number) and this email address to track the status of your request at any time:</p>
       <p><a href="${APP_URL}/status">Check Status →</a></p>
       <p>Please note that we require at least <strong>two weeks' notice</strong> to process recommendation letter requests.</p>
       <p>The CyberSafe Foundation Team</p>
@@ -86,10 +96,10 @@ export async function sendStatusUpdateNotification(ticket: {
     subject: `Update on your recommendation letter request — ${ticket.ticketRef}`,
     html: `
       <h2>Request Status Update</h2>
-      <p>Hi ${ticket.candidateName},</p>
+      <p>Hi ${esc(ticket.candidateName)},</p>
       <p>Your recommendation letter request <strong>${ticket.ticketRef}</strong> has been updated.</p>
       <p><strong>New Status:</strong> ${statusLabel}</p>
-      ${ticket.rejectionReason ? `<p><strong>Reason:</strong> ${ticket.rejectionReason}</p>` : ""}
+      ${ticket.rejectionReason ? `<p><strong>Reason:</strong> ${esc(ticket.rejectionReason)}</p>` : ""}
       <p><a href="${APP_URL}/status">Check your full status →</a></p>
       <p>The CyberSafe Foundation Team</p>
     `,
@@ -109,7 +119,7 @@ export async function sendAssigneeStatusUpdateNotification(
     subject: `Ticket ${ticket.ticketRef} status updated — ${statusLabel}`,
     html: `
       <h2>Ticket Status Update</h2>
-      <p>Hi ${assignee.name},</p>
+      <p>Hi ${esc(assignee.name)},</p>
       <p>Ticket <strong>${ticket.ticketRef}</strong>, which is assigned to you, has been updated to <strong>${statusLabel}</strong>.</p>
       <p><a href="${APP_URL}/admin/tickets/${ticket.ticketRef}">View Ticket →</a></p>
     `,
@@ -131,8 +141,8 @@ export async function sendAssignmentNotification(assignee: {
     subject: `Ticket assigned to you — ${ticket.ticketRef}`,
     html: `
       <h2>You've been assigned a ticket</h2>
-      <p>Hi ${assignee.name},</p>
-      <p>Ticket <strong>${ticket.ticketRef}</strong> for <strong>${ticket.candidateName}</strong> has been assigned to you.</p>
+      <p>Hi ${esc(assignee.name)},</p>
+      <p>Ticket <strong>${ticket.ticketRef}</strong> for <strong>${esc(ticket.candidateName)}</strong> has been assigned to you.</p>
       <p><a href="${APP_URL}/admin/tickets/${ticket.ticketRef}">View Ticket →</a></p>
     `,
   });

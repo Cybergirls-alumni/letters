@@ -10,6 +10,7 @@ export const dynamic = "force-dynamic";
 export default async function TeamPage() {
   const session = await auth();
   if (!session?.user) redirect("/admin/login");
+  const isOwner = session.user.role === "OWNER";
 
   const members = await prisma.adminUser.findMany({
     orderBy: { name: "asc" },
@@ -41,18 +42,22 @@ export default async function TeamPage() {
                       Since {formatDate(m.createdAt)}
                     </p>
                   </div>
-                  <TeamMemberActions member={{ id: m.id, name: m.name, email: m.email }} />
+                  {isOwner && (
+                    <TeamMemberActions member={{ id: m.id, name: m.name, email: m.email }} />
+                  )}
                 </li>
               ))}
             </ul>
           )}
         </div>
 
-        {/* Add member */}
-        <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5">
-          <h2 className="font-semibold text-gray-900 dark:text-slate-100 mb-4">Add Team Member</h2>
-          <AddTeamMemberForm />
-        </div>
+        {/* Add member — owners only */}
+        {isOwner && (
+          <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5">
+            <h2 className="font-semibold text-gray-900 dark:text-slate-100 mb-4">Add Team Member</h2>
+            <AddTeamMemberForm />
+          </div>
+        )}
       </div>
     </div>
   );

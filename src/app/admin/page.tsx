@@ -23,7 +23,7 @@ export default async function AdminDashboard({
   if (!session?.user) redirect("/admin/login");
 
   const { page: pageParam, status: statusFilter, assignee: assigneeFilter } = await searchParams;
-  const page = parseInt(pageParam ?? "1");
+  const page = Math.max(1, parseInt(pageParam ?? "1") || 1);
   const limit = 20;
   const skip = (page - 1) * limit;
 

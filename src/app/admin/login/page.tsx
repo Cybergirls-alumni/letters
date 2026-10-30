@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { login } from "./actions";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
@@ -16,19 +16,24 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
 
-    const result = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
-
-    if (result?.error) {
-      setError("Invalid email or password.");
-      setLoading(false);
-    } else {
-      router.push("/admin");
-      router.refresh();
+    try {
+      const result = await login(email, password);
+      if (result.ok) {
+        router.push("/admin");
+        router.refresh();
+        return;
+      }
+      setError(
+        result.reason === "locked"
+          ? "Too many failed attempts. Please wait 15 minutes and try again."
+          : result.reason === "invalid"
+            ? "Incorrect email or password."
+            : "Something went wrong. Please try again."
+      );
+    } catch {
+      setError("Could not reach the server. Check your connection and try again.");
     }
+    setLoading(false);
   }
 
   return (
