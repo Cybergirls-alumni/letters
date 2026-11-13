@@ -8,6 +8,7 @@ export default function ChangePasswordForm() {
   const router = useRouter();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -17,6 +18,12 @@ export default function ChangePasswordForm() {
     setLoading(true);
     setError(null);
     setSuccess(false);
+
+    if (newPassword !== confirmPassword) {
+      setError("The new passwords do not match.");
+      setLoading(false);
+      return;
+    }
 
     const res = await fetch(`${BASE_PATH}/api/admin/account/password`, {
       method: "POST",
@@ -31,6 +38,7 @@ export default function ChangePasswordForm() {
       setSuccess(true);
       setCurrentPassword("");
       setNewPassword("");
+      setConfirmPassword("");
       // Every session, including this one, is now invalid
       setTimeout(() => router.push("/admin/login"), 1500);
     }
@@ -67,6 +75,20 @@ export default function ChangePasswordForm() {
           className="w-full rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">Minimum 12 characters</p>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+          Confirm New Password
+        </label>
+        <input
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+          autoComplete="new-password"
+          className="w-full rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
       </div>
 
       {error && (

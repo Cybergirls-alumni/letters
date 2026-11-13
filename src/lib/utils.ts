@@ -20,8 +20,12 @@ export function generateTicketRef(): string {
   return `CG-${year}-${suffix}`;
 }
 
+// Server and browser must format in the same zone, otherwise React hydration fails (error #418)
+const DISPLAY_TIME_ZONE = "Africa/Lagos";
+
 export function formatDate(date: Date | string): string {
   return new Date(date).toLocaleDateString("en-GB", {
+    timeZone: DISPLAY_TIME_ZONE,
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -30,6 +34,7 @@ export function formatDate(date: Date | string): string {
 
 export function formatDateTime(date: Date | string): string {
   return new Date(date).toLocaleString("en-GB", {
+    timeZone: DISPLAY_TIME_ZONE,
     day: "numeric",
     month: "short",
     year: "numeric",

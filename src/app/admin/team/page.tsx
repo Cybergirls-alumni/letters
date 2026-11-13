@@ -11,6 +11,7 @@ export default async function TeamPage() {
   const session = await auth();
   if (!session?.user) redirect("/admin/login");
   const isOwner = session.user.role === "OWNER";
+  const currentUserId = session.user.id;
 
   const members = await prisma.adminUser.findMany({
     orderBy: { name: "asc" },
@@ -43,7 +44,10 @@ export default async function TeamPage() {
                     </p>
                   </div>
                   {isOwner && (
-                    <TeamMemberActions member={{ id: m.id, name: m.name, email: m.email }} />
+                    <TeamMemberActions
+                      member={{ id: m.id, name: m.name, email: m.email }}
+                      isSelf={m.id === currentUserId}
+                    />
                   )}
                 </li>
               ))}
