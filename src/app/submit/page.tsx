@@ -251,8 +251,8 @@ export default function SubmitPage() {
           <p className="text-xs text-gray-500 dark:text-slate-400">
             <strong>Your information:</strong> we collect your name, email address, admission number,
             phone number (if you give one), the details you enter about your request, and any file you
-            upload. CyberSafe Foundation staff who handle recommendation letters use it to process your
-            request and to email you about it. To ask for your information to be corrected or removed,
+            upload. The CyberSafe Foundation and CyberSafe Alumni team members who handle recommendation
+            letters use it to process your request and to email you about it. To ask for your information to be corrected or removed,
             use the &quot;Report a problem&quot; button and tell us.
           </p>
 
