@@ -7,6 +7,9 @@ export function cn(...inputs: ClassValue[]) {
 
 export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
+// Where "Report a problem" emails go
+export const REPORT_EMAIL = "cybersafealumni+bugreport@gmail.com";
+
 /**
  * Generate a collision-safe ticket reference like CG-2026-K3F9A.
  * Uses a random 5-char alphanumeric suffix — safe under concurrent requests.
