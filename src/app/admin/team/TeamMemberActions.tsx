@@ -10,7 +10,7 @@ interface Member {
   email: string;
 }
 
-export default function TeamMemberActions({ member }: { member: Member }) {
+export default function TeamMemberActions({ member, isSelf = false }: { member: Member; isSelf?: boolean }) {
   const router = useRouter();
   const [mode, setMode] = useState<"view" | "edit" | "confirm-delete">("view");
   const [name, setName] = useState(member.name);
@@ -124,12 +124,15 @@ export default function TeamMemberActions({ member }: { member: Member }) {
       >
         Edit
       </button>
-      <button
-        onClick={() => setMode("confirm-delete")}
-        className="text-xs text-red-600 dark:text-red-400 hover:underline font-medium"
-      >
-        Remove
-      </button>
+      {/* The API refuses self-removal; don't offer it */}
+      {!isSelf && (
+        <button
+          onClick={() => setMode("confirm-delete")}
+          className="text-xs text-red-600 dark:text-red-400 hover:underline font-medium"
+        >
+          Remove
+        </button>
+      )}
     </div>
   );
 }

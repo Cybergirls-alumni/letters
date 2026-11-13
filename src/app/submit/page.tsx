@@ -24,10 +24,9 @@ const schema = z.object({
     .regex(/^\+?[0-9\s\-\(\)]{7,20}$/, "Enter a valid phone number (e.g. +234 801 234 5678)")
     .optional()
     .or(z.literal("")),
-  purpose: z.enum(["SCHOOL_ADMISSION", "JOB_APPLICATION", "OTHER"]).refine(
-    (v) => v !== undefined,
-    { message: "Please select a purpose" }
-  ),
+  purpose: z.enum(["SCHOOL_ADMISSION", "JOB_APPLICATION", "OTHER"], {
+    error: "Please select a purpose",
+  }),
   organizationName: z
     .string()
     .min(2, "Organisation name must be at least 2 characters")

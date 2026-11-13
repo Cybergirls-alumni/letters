@@ -94,6 +94,12 @@ export default function StatusPage() {
           </button>
         </form>
 
+        {(!reference.trim() || !email.trim()) && !searched && (
+          <p className="text-xs text-gray-500 dark:text-slate-400 -mt-5 mb-6">
+            Fill in both fields to search.
+          </p>
+        )}
+
         {error && (
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg text-sm mb-6">
             {error}
